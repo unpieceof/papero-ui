@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import type { Recommendation } from '@/lib/supabase/types'
 import BookmarkButton from '@/components/shared/BookmarkButton'
 
@@ -29,7 +30,7 @@ export default function RecommendationListItem({
   const r = recommendation
 
   return (
-    <div className="flex items-center gap-4 px-5 py-4 bg-bg-card border border-border rounded-card transition-all hover:border-border-dark hover:shadow-[0_4px_16px_rgba(0,0,0,0.05)] card-animate">
+    <Link href={`/recommendations/${r.id}`} className="flex items-center gap-4 px-5 py-4 bg-bg-card border border-border rounded-card transition-all hover:border-border-dark hover:shadow-[0_4px_16px_rgba(0,0,0,0.05)] card-animate no-underline text-inherit">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
           <h3 className="text-[14px] font-medium leading-[1.4] tracking-[-0.2px] truncate">
@@ -69,12 +70,12 @@ export default function RecommendationListItem({
       <div className="flex items-center gap-3 shrink-0">
         <div className="flex gap-2">
           {r.arxiv_url && (
-            <a href={r.arxiv_url} target="_blank" rel="noopener noreferrer" className="text-[11px] font-mono text-ink-light hover:text-ink transition-colors no-underline">
+            <a href={r.arxiv_url} target="_blank" rel="noopener noreferrer" className="text-[11px] font-mono text-ink-light hover:text-ink transition-colors no-underline" onClick={e => e.stopPropagation()}>
               arXiv
             </a>
           )}
           {r.pdf_url && (
-            <a href={r.pdf_url} target="_blank" rel="noopener noreferrer" className="text-[11px] font-mono text-ink-light hover:text-ink transition-colors no-underline">
+            <a href={r.pdf_url} target="_blank" rel="noopener noreferrer" className="text-[11px] font-mono text-ink-light hover:text-ink transition-colors no-underline" onClick={e => e.stopPropagation()}>
               PDF
             </a>
           )}
@@ -88,6 +89,6 @@ export default function RecommendationListItem({
           />
         )}
       </div>
-    </div>
+    </Link>
   )
 }

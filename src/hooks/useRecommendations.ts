@@ -30,6 +30,27 @@ function formatWeekLabel(monday: Date, sunday: Date) {
   return `${monday.getFullYear()}년 ${mStr} — ${sStr}`
 }
 
+export function useRecommendation(id: string) {
+  const [recommendation, setRecommendation] = useState<Recommendation | null>(null)
+  const [loading, setLoading] = useState(true)
+  const supabase = createClient()
+
+  useEffect(() => {
+    supabase
+      .from('recommendations')
+      .select('*')
+      .eq('id', id)
+      .single()
+      .then(({ data, error }) => {
+        if (error) console.error('Error fetching recommendation:', error)
+        setRecommendation(data)
+        setLoading(false)
+      })
+  }, [id, supabase])
+
+  return { recommendation, loading }
+}
+
 export function useRecommendations() {
   const [recommendations, setRecommendations] = useState<Recommendation[]>([])
   const [loading, setLoading] = useState(true)

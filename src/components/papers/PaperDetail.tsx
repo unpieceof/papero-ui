@@ -73,7 +73,7 @@ export default function PaperDetail({
           href={paper.paper_url}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 text-sm text-stamp-b hover:text-stamp-a transition-colors mb-8 underline underline-offset-2"
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm border border-border rounded-[20px] text-ink-light hover:bg-ink hover:text-bg hover:border-ink transition-all no-underline mb-8"
         >
           논문 원문 보기 ↗
         </a>

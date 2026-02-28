@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import type { Recommendation } from '@/lib/supabase/types'
 import { getPatternClass, getThumbSymbol, PATTERN_BACKGROUNDS } from '@/lib/utils'
 import BookmarkButton from '@/components/shared/BookmarkButton'
@@ -33,7 +34,7 @@ export default function RecommendationCard({
   const bgColor = PATTERN_BACKGROUNDS[patternClass] || '#2c2c2c'
 
   return (
-    <div className="bg-bg-card border border-border rounded-card overflow-hidden transition-all duration-[350ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)] hover:border-border-dark card-animate">
+    <Link href={`/recommendations/${r.id}`} className="block no-underline text-inherit bg-bg-card border border-border rounded-card overflow-hidden transition-all duration-[350ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)] hover:border-border-dark card-animate">
       {/* Thumbnail */}
       <div
         className="w-full h-[140px] relative overflow-hidden flex items-center justify-center"
@@ -144,6 +145,6 @@ export default function RecommendationCard({
           )}
         </div>
       </div>
-    </div>
+    </Link>
   )
 }
