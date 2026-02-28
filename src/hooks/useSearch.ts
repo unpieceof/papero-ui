@@ -4,14 +4,12 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Paper, Recommendation } from '@/lib/supabase/types'
 
-type SearchContext = 'papers' | 'recommendations'
-
 interface SearchResult {
   papers: Paper[]
   recommendations: Recommendation[]
 }
 
-export function useSearch(context: SearchContext = 'papers') {
+export function useSearch() {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SearchResult>({ papers: [], recommendations: [] })
   const [searching, setSearching] = useState(false)
@@ -28,32 +26,28 @@ export function useSearch(context: SearchContext = 'papers') {
     setSearching(true)
     const pattern = `%${q.trim()}%`
 
-    const newResults: SearchResult = { papers: [], recommendations: [] }
-
-    if (context === 'papers') {
-      const { data } = await supabase
+    const [papersRes, recsRes] = await Promise.all([
+      supabase
         .from('papers')
         .select('*, author:profiles(*), stamps(*)')
         .or(`title.ilike.${pattern},hook.ilike.${pattern},content.ilike.${pattern}`)
         .order('created_at', { ascending: false })
-        .limit(20)
-      newResults.papers = data || []
-    }
-
-    if (context === 'recommendations') {
-      const { data } = await supabase
+        .limit(20),
+      supabase
         .from('recommendations')
         .select('*')
         .or(`title.ilike.${pattern},summary_ko.ilike.${pattern}`)
         .order('created_at', { ascending: false })
-        .limit(20)
-      newResults.recommendations = data || []
-    }
+        .limit(20),
+    ])
 
-    setResults(newResults)
+    setResults({
+      papers: papersRes.data || [],
+      recommendations: recsRes.data || [],
+    })
 
     setSearching(false)
-  }, [supabase, context])
+  }, [supabase])
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current)

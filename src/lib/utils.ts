@@ -7,6 +7,14 @@ export function formatDate(dateStr: string): string {
   return `${y}.${m}.${day}`
 }
 
+/** Format time to HH:MM */
+export function formatTime(dateStr: string): string {
+  const d = new Date(dateStr)
+  const h = String(d.getHours()).padStart(2, '0')
+  const m = String(d.getMinutes()).padStart(2, '0')
+  return `${h}:${m}`
+}
+
 /** Extract year from date string */
 export function getYear(dateStr: string): number {
   return new Date(dateStr).getFullYear()

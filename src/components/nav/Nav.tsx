@@ -29,8 +29,6 @@ export default function Nav() {
   const chatButtonRef = useRef<HTMLButtonElement>(null)
   const { messages, sendMessage, loading: chatLoading, unreadCount } = useChat(user?.id ?? '', showChat)
 
-  const searchContext = pathname.startsWith('/recommendations') ? 'recommendations' as const : 'papers' as const
-
   const profileA = profiles.find(p => p.user_type === 'a')
   const profileB = profiles.find(p => p.user_type === 'b')
 
@@ -173,7 +171,7 @@ export default function Nav() {
       </nav>
 
       {/* Search Overlay */}
-      {showSearch && <SearchBar context={searchContext} onClose={() => setShowSearch(false)} />}
+      {showSearch && <SearchBar onClose={() => setShowSearch(false)} />}
 
       {/* Login Modal */}
       {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
