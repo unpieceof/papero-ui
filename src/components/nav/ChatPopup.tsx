@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import type { Message, Profile } from '@/lib/supabase/types'
+import { formatTime } from '@/lib/utils'
 
 interface ChatPopupProps {
   userId: string
@@ -86,15 +87,20 @@ export default function ChatPopup({ userId, userProfile, messages, sendMessage, 
               {!isMine && msg.user && (
                 <span className="text-[10px] text-[var(--ink-faint)] px-1">{msg.user.nickname}</span>
               )}
-              <div
-                className="max-w-[220px] px-3 py-2 rounded-xl text-sm leading-snug break-words"
-                style={
-                  isMine
-                    ? { background: userProfile.point_color, color: '#fff' }
-                    : { background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--ink)' }
-                }
-              >
-                {msg.content}
+              <div className={`flex items-end gap-1.5 ${isMine ? 'flex-row-reverse' : 'flex-row'}`}>
+                <div
+                  className="max-w-[220px] px-3 py-2 rounded-xl text-sm leading-snug break-words"
+                  style={
+                    isMine
+                      ? { background: userProfile.point_color, color: '#fff' }
+                      : { background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--ink)' }
+                  }
+                >
+                  {msg.content}
+                </div>
+                <span className="text-[10px] font-mono text-[var(--ink-faint)] shrink-0 pb-0.5">
+                  {formatTime(msg.created_at)}
+                </span>
               </div>
             </div>
           )

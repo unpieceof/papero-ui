@@ -8,11 +8,10 @@ import { formatDate } from '@/lib/utils'
 
 interface SearchBarProps {
   onClose: () => void
-  context?: 'papers' | 'recommendations'
 }
 
-export default function SearchBar({ onClose, context = 'papers' }: SearchBarProps) {
-  const { query, setQuery, results, searching, clearSearch } = useSearch(context)
+export default function SearchBar({ onClose }: SearchBarProps) {
+  const { query, setQuery, results, searching, clearSearch } = useSearch()
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -55,7 +54,7 @@ export default function SearchBar({ onClose, context = 'papers' }: SearchBarProp
               type="text"
               value={query}
               onChange={e => setQuery(e.target.value)}
-              placeholder={context === 'papers' ? '리뷰 검색...' : '추천 논문 검색...'}
+              placeholder="검색..."
               className="flex-1 bg-transparent border-none outline-none text-[15px] text-ink placeholder:text-ink-faint font-sans"
             />
             {query && (
