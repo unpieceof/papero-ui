@@ -128,7 +128,11 @@ export default function Nav() {
             <button
               ref={chatButtonRef}
               onClick={() => setShowChat(!showChat)}
-              className="w-9 h-9 rounded-full border-[1.5px] border-border bg-transparent text-ink-light flex items-center justify-center transition-all hover:bg-ink hover:text-bg hover:border-ink cursor-pointer"
+              className={`w-9 h-9 rounded-full border-[1.5px] flex items-center justify-center transition-all cursor-pointer ${
+                showChat
+                  ? 'bg-ink text-bg border-ink'
+                  : 'border-border bg-transparent text-ink-light hover:bg-ink hover:text-bg hover:border-ink'
+              }`}
               title="채팅"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
