@@ -26,24 +26,31 @@ function setReadTimestamp(paperId: string) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(reads))
 }
 
+export interface UnreadPaper {
+  id: string
+  title: string
+}
+
 export function useCommentNotifications(userId: string | undefined) {
-  const [unreadCount, setUnreadCount] = useState(0)
+  const [unreadPapers, setUnreadPapers] = useState<UnreadPaper[]>([])
   const supabase = createClient()
   const myPaperIdsRef = useRef<Set<string>>(new Set())
+  const myPaperTitlesRef = useRef<Record<string, string>>({})
 
-  const computeUnreadCount = useCallback(async () => {
-    if (!userId) { setUnreadCount(0); return }
+  const computeUnread = useCallback(async () => {
+    if (!userId) { setUnreadPapers([]); return }
 
-    // 1. Fetch my paper IDs
+    // 1. Fetch my papers (id + title)
     const { data: papers } = await supabase
       .from('papers')
-      .select('id')
+      .select('id, title')
       .eq('author_id', userId)
 
-    if (!papers || papers.length === 0) { setUnreadCount(0); return }
+    if (!papers || papers.length === 0) { setUnreadPapers([]); return }
 
     const myPaperIds = papers.map(p => p.id)
     myPaperIdsRef.current = new Set(myPaperIds)
+    myPaperTitlesRef.current = Object.fromEntries(papers.map(p => [p.id, p.title]))
 
     // 2. Fetch comments on my papers from other users
     const { data: comments } = await supabase
@@ -53,27 +60,29 @@ export function useCommentNotifications(userId: string | undefined) {
       .neq('user_id', userId)
       .order('created_at', { ascending: false })
 
-    if (!comments || comments.length === 0) { setUnreadCount(0); return }
+    if (!comments || comments.length === 0) { setUnreadPapers([]); return }
 
     // 3. Compare with localStorage read timestamps
     const reads = getReadTimestamps()
-    const unreadPapers = new Set<string>()
+    const unreadIds = new Set<string>()
 
     for (const c of comments) {
       const lastRead = reads[c.paper_id]
       if (!lastRead || c.created_at > lastRead) {
-        unreadPapers.add(c.paper_id)
+        unreadIds.add(c.paper_id)
       }
     }
 
-    setUnreadCount(unreadPapers.size)
+    setUnreadPapers(
+      Array.from(unreadIds).map(id => ({ id, title: myPaperTitlesRef.current[id] || '' }))
+    )
   }, [userId, supabase])
 
   useEffect(() => {
-    computeUnreadCount()
+    computeUnread()
 
     // Listen for markRead events from other components
-    const onRead = () => computeUnreadCount()
+    const onRead = () => computeUnread()
     window.addEventListener(COMMENT_READ_EVENT, onRead)
 
     // Realtime subscription on comments INSERT
@@ -84,7 +93,6 @@ export function useCommentNotifications(userId: string | undefined) {
         { event: 'INSERT', schema: 'public', table: 'comments' },
         (payload) => {
           const newComment = payload.new as CommentRow
-          // Only care about comments on my papers from other users
           if (
             userId &&
             newComment.user_id !== userId &&
@@ -93,7 +101,10 @@ export function useCommentNotifications(userId: string | undefined) {
             const reads = getReadTimestamps()
             const lastRead = reads[newComment.paper_id]
             if (!lastRead || newComment.created_at > lastRead) {
-              setUnreadCount(c => c + 1)
+              setUnreadPapers(prev => {
+                if (prev.some(p => p.id === newComment.paper_id)) return prev
+                return [...prev, { id: newComment.paper_id, title: myPaperTitlesRef.current[newComment.paper_id] || '' }]
+              })
             }
           }
         }
@@ -104,12 +115,12 @@ export function useCommentNotifications(userId: string | undefined) {
       window.removeEventListener(COMMENT_READ_EVENT, onRead)
       supabase.removeChannel(channel)
     }
-  }, [computeUnreadCount, supabase, userId])
+  }, [computeUnread, supabase, userId])
 
   const markPaperRead = useCallback((paperId: string) => {
     setReadTimestamp(paperId)
     window.dispatchEvent(new Event(COMMENT_READ_EVENT))
   }, [])
 
-  return { unreadCount, markPaperRead }
+  return { unreadCount: unreadPapers.length, unreadPapers, markPaperRead }
 }
