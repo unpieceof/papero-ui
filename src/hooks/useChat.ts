@@ -23,7 +23,7 @@ export function useChat(userId: string, isOpen: boolean) {
       .from('messages')
       .select('*, user:profiles(*)')
       .order('created_at', { ascending: true })
-      .limit(100)
+      .limit(50)
     if (data) setMessages(data as Message[])
   }, [supabase])
 
