@@ -1,0 +1,22 @@
+-- ============================================
+-- PAPERSTAMP Seed Data
+-- ============================================
+-- NOTE: Users must be created via Supabase Auth (Dashboard or API).
+-- Create two users with these emails:
+--   1. young@paperstamp.dev (password: password123) — will auto-create profile with user_type 'a'
+--   2. chap@paperstamp.dev  (password: password123) — will auto-create profile with user_type 'b'
+--
+-- When creating users, set raw_user_meta_data:
+--   User A: {"nickname": "영영", "user_type": "a"}
+--   User B: {"nickname": "찹찹", "user_type": "b"}
+--
+-- After users are created, run the sample data below using the actual user UUIDs.
+
+-- Example sample papers (replace UUIDs after user creation):
+-- insert into public.papers (author_id, title, paper_url, hook, content, tags)
+-- values
+--   ('<USER_A_UUID>', 'Scaling Monosemanticity: Extracting Interpretable Features from Claude 3 Sonnet', 'https://arxiv.org/abs/2406.xxxxx', '모델 내부를 들여다보는 가장 직관적인 방법이 나왔다', '## Summary\n\nThis paper...', '{NLP,Interpretability}'),
+--   ('<USER_B_UUID>', 'Constitutional AI: Harmlessness from AI Feedback', 'https://arxiv.org/abs/2212.xxxxx', 'RLHF 없이도 안전한 AI를 만들 수 있을까?', '## Summary\n\nConstitutional AI...', '{NLP,Safety}'),
+--   ('<USER_A_UUID>', 'Segment Anything Model 2: Real-Time Object Segmentation', 'https://arxiv.org/abs/2408.xxxxx', '비디오까지 확장된 SAM, 이건 진짜 게임체인저', '## Summary\n\nSAM2...', '{CV,Segmentation}'),
+--   ('<USER_B_UUID>', 'Direct Preference Optimization', 'https://arxiv.org/abs/2305.xxxxx', 'Reward model 없이 RLHF를 끝내는 우아한 방법', '## Summary\n\nDPO...', '{RL,Alignment}'),
+--   ('<USER_A_UUID>', 'LLaVA-NeXT: Improved Reasoning and Visual Instruction Tuning', 'https://arxiv.org/abs/2410.xxxxx', '멀티모달 AI의 새로운 기준점, 추론 능력이 다르다', '## Summary\n\nLLaVA-NeXT...', '{Multimodal,VLM}');
