@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useRef, useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { useProfile, useAllProfiles } from '@/hooks/useProfile'
+import { useChat } from '@/hooks/useChat'
 import LoginModal from './LoginModal'
 import ProfilePopover from './ProfilePopover'
 import ChatPopup from './ChatPopup'
@@ -26,6 +27,7 @@ export default function Nav() {
   const [showSearch, setShowSearch] = useState(false)
   const [showChat, setShowChat] = useState(false)
   const chatButtonRef = useRef<HTMLButtonElement>(null)
+  const { messages, sendMessage, loading: chatLoading, unreadCount } = useChat(user?.id ?? '', showChat)
 
   const searchContext = pathname.startsWith('/recommendations') ? 'recommendations' as const : 'papers' as const
 
@@ -125,20 +127,27 @@ export default function Nav() {
 
           {/* Chat button - logged in only */}
           {user && (
-            <button
-              ref={chatButtonRef}
-              onClick={() => setShowChat(!showChat)}
-              className={`w-9 h-9 rounded-full border-[1.5px] flex items-center justify-center transition-all cursor-pointer ${
-                showChat
-                  ? 'bg-ink text-bg border-ink'
-                  : 'border-border bg-transparent text-ink-light hover:bg-ink hover:text-bg hover:border-ink'
-              }`}
-              title="채팅"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-              </svg>
-            </button>
+            <div className="relative">
+              <button
+                ref={chatButtonRef}
+                onClick={() => setShowChat(!showChat)}
+                className={`w-9 h-9 rounded-full border-[1.5px] flex items-center justify-center transition-all cursor-pointer ${
+                  showChat
+                    ? 'bg-ink text-bg border-ink'
+                    : 'border-border bg-transparent text-ink-light hover:bg-ink hover:text-bg hover:border-ink'
+                }`}
+                title="채팅"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+              </button>
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-[#e74c3c] text-white text-[10px] font-bold flex items-center justify-center leading-none pointer-events-none">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </div>
           )}
 
           {/* Write button */}
@@ -184,6 +193,9 @@ export default function Nav() {
         <ChatPopup
           userId={user.id}
           userProfile={profile}
+          messages={messages}
+          sendMessage={sendMessage}
+          loading={chatLoading}
           onClose={() => setShowChat(false)}
           chatButtonRef={chatButtonRef}
         />

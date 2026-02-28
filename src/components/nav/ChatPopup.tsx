@@ -1,22 +1,22 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { useChat } from '@/hooks/useChat'
-import type { Profile } from '@/lib/supabase/types'
+import type { Message, Profile } from '@/lib/supabase/types'
 
 interface ChatPopupProps {
   userId: string
   userProfile: Profile
+  messages: Message[]
+  sendMessage: (content: string) => Promise<void>
+  loading: boolean
   onClose: () => void
   chatButtonRef: React.RefObject<HTMLButtonElement | null>
 }
 
-export default function ChatPopup({ userId, userProfile, onClose, chatButtonRef }: ChatPopupProps) {
-  const { messages, sendMessage, loading } = useChat()
+export default function ChatPopup({ userId, userProfile, messages, sendMessage, loading, onClose, chatButtonRef }: ChatPopupProps) {
   const [input, setInput] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
   const popupRef = useRef<HTMLDivElement>(null)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -42,7 +42,7 @@ export default function ChatPopup({ userId, userProfile, onClose, chatButtonRef 
     if (!input.trim()) return
     const content = input
     setInput('')
-    await sendMessage(content, userId)
+    await sendMessage(content)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -105,7 +105,6 @@ export default function ChatPopup({ userId, userProfile, onClose, chatButtonRef 
       {/* Input */}
       <div className="shrink-0 flex items-end gap-2 px-3 py-2.5 border-t border-[var(--border)]">
         <textarea
-          ref={textareaRef}
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
