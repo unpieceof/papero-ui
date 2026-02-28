@@ -2,11 +2,12 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { useProfile, useAllProfiles } from '@/hooks/useProfile'
 import LoginModal from './LoginModal'
 import ProfilePopover from './ProfilePopover'
+import ChatPopup from './ChatPopup'
 import SearchBar from '@/components/shared/SearchBar'
 
 const TABS = [
@@ -23,6 +24,8 @@ export default function Nav() {
   const [showLogin, setShowLogin] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
   const [showSearch, setShowSearch] = useState(false)
+  const [showChat, setShowChat] = useState(false)
+  const chatButtonRef = useRef<HTMLButtonElement>(null)
 
   const searchContext = pathname.startsWith('/recommendations') ? 'recommendations' as const : 'papers' as const
 
@@ -120,6 +123,20 @@ export default function Nav() {
             </svg>
           </button>
 
+          {/* Chat button - logged in only */}
+          {user && (
+            <button
+              ref={chatButtonRef}
+              onClick={() => setShowChat(!showChat)}
+              className="w-9 h-9 rounded-full border-[1.5px] border-border bg-transparent text-ink-light flex items-center justify-center transition-all hover:bg-ink hover:text-bg hover:border-ink cursor-pointer"
+              title="채팅"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+            </button>
+          )}
+
           {/* Write button */}
           <Link
             href={user ? '/papers/new' : '#'}
@@ -155,6 +172,16 @@ export default function Nav() {
           onUpdate={updateProfile}
           onClose={() => setShowProfile(false)}
           onSignOut={signOut}
+        />
+      )}
+
+      {/* Chat Popup */}
+      {showChat && user && profile && (
+        <ChatPopup
+          userId={user.id}
+          userProfile={profile}
+          onClose={() => setShowChat(false)}
+          chatButtonRef={chatButtonRef}
         />
       )}
     </>

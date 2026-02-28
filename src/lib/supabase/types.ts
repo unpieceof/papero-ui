@@ -83,6 +83,15 @@ export interface Comment {
   user?: Profile
 }
 
+export interface Message {
+  id: string
+  user_id: string
+  content: string
+  created_at: string
+  // joined
+  user?: Profile
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -115,6 +124,11 @@ export interface Database {
         Row: Comment
         Insert: Omit<Comment, 'id' | 'created_at' | 'updated_at' | 'user'>
         Update: Partial<Omit<Comment, 'id' | 'created_at' | 'user'>>
+      }
+      messages: {
+        Row: Message
+        Insert: Omit<Message, 'id' | 'created_at' | 'user'>
+        Update: never
       }
     }
   }
