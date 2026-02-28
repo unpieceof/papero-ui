@@ -6,6 +6,7 @@ import { useRef, useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { useProfile, useAllProfiles } from '@/hooks/useProfile'
 import { useChat } from '@/hooks/useChat'
+import { useCommentNotifications } from '@/hooks/useCommentNotifications'
 import LoginModal from './LoginModal'
 import ProfilePopover from './ProfilePopover'
 import ChatPopup from './ChatPopup'
@@ -28,6 +29,7 @@ export default function Nav() {
   const [showChat, setShowChat] = useState(false)
   const chatButtonRef = useRef<HTMLButtonElement>(null)
   const { messages, sendMessage, loading: chatLoading, unreadCount } = useChat(user?.id ?? '', showChat)
+  const { unreadCount: commentUnread } = useCommentNotifications(user?.id)
 
   const profileA = profiles.find(p => p.user_type === 'a')
   const profileB = profiles.find(p => p.user_type === 'b')
@@ -122,6 +124,25 @@ export default function Nav() {
               <path d="m21 21-4.3-4.3" />
             </svg>
           </button>
+
+          {/* Comment notification bell - logged in only */}
+          {user && (
+            <Link
+              href="/papers"
+              className="relative w-9 h-9 rounded-full border-[1.5px] border-border bg-transparent text-ink-light flex items-center justify-center transition-all hover:bg-ink hover:text-bg hover:border-ink no-underline"
+              title="댓글 알림"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+              </svg>
+              {commentUnread > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-[#e74c3c] text-white text-[10px] font-bold flex items-center justify-center leading-none pointer-events-none">
+                  {commentUnread > 9 ? '9+' : commentUnread}
+                </span>
+              )}
+            </Link>
+          )}
 
           {/* Chat button - logged in only */}
           {user && (
