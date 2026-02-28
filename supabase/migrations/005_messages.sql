@@ -7,3 +7,5 @@ CREATE TABLE messages (
 
 ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "allow all" ON messages FOR ALL USING (true) WITH CHECK (true);
+
+ALTER PUBLICATION supabase_realtime ADD TABLE messages;
