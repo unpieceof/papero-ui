@@ -69,6 +69,7 @@ export function usePapers(options: UsePapersOptions = {}) {
 
 export function usePaper(id: string) {
   const [paper, setPaper] = useState<Paper | null>(null)
+  const [paperIndex, setPaperIndex] = useState(1)
   const [loading, setLoading] = useState(true)
   const supabase = createClient()
 
@@ -78,12 +79,19 @@ export function usePaper(id: string) {
       .select('*, author:profiles(*), stamps(*, user:profiles(*))')
       .eq('id', id)
       .single()
-      .then(({ data, error }) => {
+      .then(async ({ data, error }) => {
         if (error) console.error('Error fetching paper:', error)
         setPaper(data)
+        if (data) {
+          const { count } = await supabase
+            .from('papers')
+            .select('*', { count: 'exact', head: true })
+            .lte('created_at', data.created_at)
+          setPaperIndex(count || 1)
+        }
         setLoading(false)
       })
   }, [id, supabase])
 
-  return { paper, loading }
+  return { paper, paperIndex, loading }
 }

@@ -28,7 +28,7 @@ export default function PaperDetailPage() {
   useEffect(() => {
     if (user?.id && id) markPaperRead(id)
   }, [user?.id, id])
-  const { paper, loading } = usePaper(id)
+  const { paper, paperIndex, loading } = usePaper(id)
   const { profiles } = useAllProfiles()
   const { toggleStamp, animatingStamp } = useStamps()
 
@@ -69,7 +69,7 @@ export default function PaperDetailPage() {
       currentUserId={user?.id}
       animatingStamp={animatingStamp}
       onToggleStamp={handleToggleStamp}
-      paperIndex={1}
+      paperIndex={paperIndex}
     />
   )
 }
