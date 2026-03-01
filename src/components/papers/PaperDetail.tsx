@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
 import type { Paper, Profile } from '@/lib/supabase/types'
 import { formatDate, formatPaperNumber } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
@@ -92,7 +94,7 @@ export default function PaperDetail({
 
       {/* Content */}
       <div className="markdown-content mb-12">
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
           {paper.content}
         </ReactMarkdown>
       </div>

@@ -5,6 +5,10 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { Paper } from '@/lib/supabase/types'
 import TagInput from '@/components/shared/TagInput'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
 
 interface PaperFormProps {
   paper?: Paper | null
@@ -23,6 +27,7 @@ export default function PaperForm({ paper, userId }: PaperFormProps) {
   const [tags, setTags] = useState<string[]>(paper?.tags || [])
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [previewMode, setPreviewMode] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -130,16 +135,55 @@ export default function PaperForm({ paper, userId }: PaperFormProps) {
 
       {/* Content (Markdown) */}
       <div className="mb-6">
-        <label className="block text-xs text-ink-light mb-2 font-medium">
-          리뷰 내용 (마크다운 지원)
-        </label>
-        <textarea
-          value={content}
-          onChange={e => setContent(e.target.value)}
-          rows={16}
-          placeholder="## Summary&#10;&#10;핵심 내용을 정리해보세요...&#10;&#10;## Key Insights&#10;&#10;- 인사이트 1&#10;- 인사이트 2"
-          className="w-full px-4 py-3 border border-border rounded-card text-sm bg-bg outline-none focus:border-border-dark transition-colors font-mono resize-y leading-relaxed"
-        />
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-xs text-ink-light font-medium">
+            리뷰 내용 (마크다운 지원)
+          </label>
+          <div className="flex gap-1 bg-[rgba(0,0,0,0.04)] rounded-[20px] p-0.5">
+            <button
+              type="button"
+              onClick={() => setPreviewMode(false)}
+              className={`px-3 py-1 text-[11px] rounded-[18px] border-none cursor-pointer transition-all font-sans ${
+                !previewMode
+                  ? 'bg-ink text-bg'
+                  : 'bg-transparent text-ink-light hover:text-ink'
+              }`}
+            >
+              작성
+            </button>
+            <button
+              type="button"
+              onClick={() => setPreviewMode(true)}
+              className={`px-3 py-1 text-[11px] rounded-[18px] border-none cursor-pointer transition-all font-sans ${
+                previewMode
+                  ? 'bg-ink text-bg'
+                  : 'bg-transparent text-ink-light hover:text-ink'
+              }`}
+            >
+              미리보기
+            </button>
+          </div>
+        </div>
+
+        {previewMode ? (
+          <div className="markdown-content w-full px-4 py-3 border border-border rounded-card text-sm bg-bg min-h-[408px] overflow-y-auto">
+            {content ? (
+              <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                {content}
+              </ReactMarkdown>
+            ) : (
+              <p className="text-ink-faint italic">미리볼 내용이 없습니다</p>
+            )}
+          </div>
+        ) : (
+          <textarea
+            value={content}
+            onChange={e => setContent(e.target.value)}
+            rows={16}
+            placeholder="## Summary&#10;&#10;핵심 내용을 정리해보세요...&#10;&#10;## Key Insights&#10;&#10;- 인사이트 1&#10;- 인사이트 2"
+            className="w-full px-4 py-3 border border-border rounded-card text-sm bg-bg outline-none focus:border-border-dark transition-colors font-mono resize-y leading-relaxed"
+          />
+        )}
       </div>
 
       {/* Tags */}
